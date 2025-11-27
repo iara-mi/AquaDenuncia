@@ -1,126 +1,40 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>AquaDenuncia - Denúncia de Desperdício</title>
-    
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-            background-color: #f4f4f4;
-        }
-        .logo-header {
-            background-color: #008CBA;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 2.8em;
-            width: 100%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .logo-header span {
-            font-weight: bold;
-            color: #4CAF50;
-        }
-        h1 { 
-            text-align: center; 
-            color: #008CBA; 
-            margin-top: 30px; 
-        }
-        form { 
-            max-width: 600px; 
-            width: 90%; 
-            margin-bottom: 30px;
-            padding: 30px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
-        label, select, textarea, button {
-            width: 100%;
-            margin-bottom: 15px;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body onload="getLocation()">
-    
-    <div class="logo-header">
-        Aqua<span>Denuncia</span>
-    </div>
+<script>
+    // ... (restante do código JS, como getLocation, success e error)
 
-    <h1>Denuncie o Desperdício de Água</h1>
-    <form action="salvar_denuncia.php" method="POST">
+    // NOVO BLOCO PARA MOSTRAR A MENSAGEM DE SUCESSO OU ERRO
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        const form = document.querySelector('form');
         
-        <label for="tipo_denuncia">Tipo de Desperdício:</label>
-        <select id="tipo_denuncia" name="tipo_denuncia" required>
-            <option value="">Selecione...</option>
-            <option value="Vazamento Rua">Vazamento na Rua</option>
-            <option value="Hidrante Aberto">Hidrante Aberto</option>
-            <option value="Lavagem Calçada">Lavagem de Calçada</option>
-            <option value="Outro">Outro</option>
-        </select>
-        
-        <label for="detalhes">Detalhes da Ocorrência:</label>
-        <textarea id="detalhes" name="detalhes" rows="4" required></textarea>
-        
-        <input type="hidden" name="latitude" id="latitude" value="">
-        <input type="hidden" name="longitude" id="longitude" value="">
+        let message = '';
+        let color = '';
 
-        <p id="localizacao_status">Tentando obter sua localização...</p>
-        
-        <button type="submit">ENVIAR DENÚNCIA</button>
-    </form>
-
-    <script>
-        function setCoordinates(lat, lon) {
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lon;
-            document.getElementById('localizacao_status').innerHTML = 'Localização obtida: ' + lat.substring(0, 8) + ', ' + lon.substring(0, 8);
+        if (status === 'sucesso') {
+            message = '✅ Denúncia enviada com sucesso! Obrigado por ajudar.';
+            color = '#4CAF50'; // Cor verde
+        } else if (status === 'erro_salvar') {
+            message = '❌ Falha ao enviar a denúncia. Verifique sua conexão.';
+            color = 'red';
         }
 
-        function success(pos) {
-            const crd = pos.coords;
-            setCoordinates(crd.latitude.toString(), crd.longitude.toString());
+        if (message) {
+            const messageDiv = document.createElement('div');
+            // Estilos CSS para a mensagem
+            messageDiv.style.cssText = `
+                padding: 15px; 
+                margin-bottom: 20px; 
+                border-radius: 5px; 
+                background-color: ${color}22;
+                color: ${color};
+                font-weight: bold;
+                text-align: center;
+            `;
+            messageDiv.innerHTML = message;
+            // Insere a mensagem antes do formulário
+            form.insertAdjacentElement('beforebegin', messageDiv); 
         }
-
-        function error(err) {
-            document.getElementById('localizacao_status').innerHTML = 'Falha ao obter a localização. Por favor, tente novamente.';
-            console.warn(`ERRO (${err.code}): ${err.message}`);
-        }
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                // AQUI O NAVEGADOR PEDE PERMISSÃO DE LOCALIZAÇÃO
-                navigator.geolocation.getCurrentPosition(success, error, {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 0
-                });
-            } else {
-                document.getElementById('localizacao_status').innerHTML = 'Localização não suportada.';
-            }
-        }
-    </script>
+    });
+</script>
 </body>
-</html> 
+</html>
