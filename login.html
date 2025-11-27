@@ -1,40 +1,38 @@
-<script>
-    // ... (restante do código JS, como getLocation, success e error)
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Painel Administrativo</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f4f4f4; }
+        .login-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 300px; }
+        h2 { text-align: center; color: #008CBA; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="email"], input[type="password"] { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; background-color: #4CAF50; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .error { color: red; text-align: center; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
 
-    // NOVO BLOCO PARA MOSTRAR A MENSAGEM DE SUCESSO OU ERRO
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const status = urlParams.get('status');
-        const form = document.querySelector('form');
+<div class="login-container">
+    <h2>Acesso Administrativo</h2>
+    
+    <?php if(isset($_GET['erro'])): ?>
+        <p class="error">Credenciais inválidas. Tente novamente.</p>
+    <?php endif; ?>
+    
+    <form action="autenticar.php" method="POST">
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
         
-        let message = '';
-        let color = '';
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required>
+        
+        <button type="submit">Entrar</button>
+    </form>
+</div>
 
-        if (status === 'sucesso') {
-            message = '✅ Denúncia enviada com sucesso! Obrigado por ajudar.';
-            color = '#4CAF50'; // Cor verde
-        } else if (status === 'erro_salvar') {
-            message = '❌ Falha ao enviar a denúncia. Verifique sua conexão.';
-            color = 'red';
-        }
-
-        if (message) {
-            const messageDiv = document.createElement('div');
-            // Estilos CSS para a mensagem
-            messageDiv.style.cssText = `
-                padding: 15px; 
-                margin-bottom: 20px; 
-                border-radius: 5px; 
-                background-color: ${color}22;
-                color: ${color};
-                font-weight: bold;
-                text-align: center;
-            `;
-            messageDiv.innerHTML = message;
-            // Insere a mensagem antes do formulário
-            form.insertAdjacentElement('beforebegin', messageDiv); 
-        }
-    });
-</script>
 </body>
 </html>
