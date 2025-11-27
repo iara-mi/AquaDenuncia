@@ -32,40 +32,31 @@
     </form>
 
     <script>
-        const DEFAULT_LAT = '-23.550520';
-        const DEFAULT_LON = '-46.633309';
-
         function setCoordinates(lat, lon) {
-
             document.getElementById('latitude').value = lat;
             document.getElementById('longitude').value = lon;
-            document.getElementById('localizacao_status').innerHTML = 'Localização: ' + lat.substring(0, 8) + ', ' + lon.substring(0, 8);
+            document.getElementById('localizacao_status').innerHTML = 'Localização obtida: ' + lat.substring(0, 8) + ', ' + lon.substring(0, 8);
         }
 
         function success(pos) {
-
             const crd = pos.coords;
             setCoordinates(crd.latitude.toString(), crd.longitude.toString());
         }
 
         function error(err) {
-
-            setCoordinates(DEFAULT_LAT, DEFAULT_LON);
-            document.getElementById('localizacao_status').innerHTML = '⚠ Localização padrão (GPS bloqueado pelo navegador).';
+            document.getElementById('localizacao_status').innerHTML = 'Falha ao obter a localização. Por favor, tente novamente.';
+            console.warn(`ERRO (${err.code}): ${err.message}`);
         }
 
         function getLocation() {
             if (navigator.geolocation) {
-
                 navigator.geolocation.getCurrentPosition(success, error, {
                     enableHighAccuracy: true,
                     timeout: 5000,
                     maximumAge: 0
                 });
             } else {
-
-                setCoordinates(DEFAULT_LAT, DEFAULT_LON);
-                document.getElementById('localizacao_status').innerHTML = 'Localização não suportada. Usando coordenadas padrão.';
+                document.getElementById('localizacao_status').innerHTML = 'Localização não suportada.';
             }
         }
     </script>
