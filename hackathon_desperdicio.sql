@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 27/11/2025 às 01:16
+-- Tempo de geração: 27/11/2025 às 17:21
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.0.30
 
@@ -29,22 +29,14 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `denuncias` (
   `id` int(11) NOT NULL,
-  `tipo_desperdicio` varchar(255) NOT NULL,
-  `detalhes` text DEFAULT NULL,
-  `latitude` varchar(50) NOT NULL,
-  `longitude` varchar(50) NOT NULL,
-  `status` varchar(50) DEFAULT 'Aberto',
-  `data_hora` datetime DEFAULT current_timestamp()
+  `tipo_denuncia` varchar(255) NOT NULL,
+  `detalhes` text NOT NULL,
+  `latitude` varchar(50) DEFAULT '0',
+  `longitude` varchar(50) DEFAULT '0',
+  `status` enum('Pendente','Resolvido') DEFAULT 'Pendente',
+  `data_criacao` datetime DEFAULT current_timestamp(),
+  `data_resolucao` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `denuncias`
---
-
-INSERT INTO `denuncias` (`id`, `tipo_desperdicio`, `detalhes`, `latitude`, `longitude`, `status`, `data_hora`) VALUES
-(1, 'Agua - Vazamento', '', '-22.9616', '-49.8632', 'Aberto', '2025-11-26 21:05:33'),
-(2, 'Energia - Lampada Acesa', '', '-22.9616', '-49.8632', 'Aberto', '2025-11-26 21:07:00'),
-(3, 'Agua - Vazamento', 'está tendo um vazamento perto da minha casa.', '-22.9616', '-49.8632', 'Aberto', '2025-11-26 21:09:06');
 
 --
 -- Índices para tabelas despejadas
@@ -64,7 +56,7 @@ ALTER TABLE `denuncias`
 -- AUTO_INCREMENT de tabela `denuncias`
 --
 ALTER TABLE `denuncias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
