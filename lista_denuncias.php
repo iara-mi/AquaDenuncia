@@ -13,12 +13,14 @@ if (isset($_GET['acao']) && $_GET['acao'] == 'resolver' && isset($_GET['id'])) {
         header("Location: lista_denuncias.php?status=atualizado");
         exit();
     }
+   
 }
 
 $sql_select = "SELECT id, tipo_denuncia, detalhes, latitude, longitude, status, data_criacao FROM denuncias ORDER BY data_criacao DESC";
 $resultado = $conn->query($sql_select);
 
-if ($resultado->num_rows > 0) {
+
+if ($resultado !== false && $resultado->num_rows > 0) {
     $denuncias = $resultado->fetch_all(MYSQLI_ASSOC);
 } else {
     $denuncias = [];
@@ -40,8 +42,7 @@ $conn->close();
             padding: 20px;
             text-align: center;
             font-size: 2.8em;
-            margin-bottom: 25px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 100%; 
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .logo-header span {
@@ -49,21 +50,27 @@ $conn->close();
             color: #4CAF50; 
         }
 
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        h1 { text-align: center; color: #008CBA; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; }
+        h1 { text-align: center; color: #008CBA; margin-top: 30px; }
         table {
             border-collapse: collapse;
-            width: 90%; 
+            width: 95%; 
             margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 12px;
             text-align: left;
         }
         th {
             background-color: #008CBA;
             color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
     </style>
 </head>
@@ -72,7 +79,8 @@ $conn->close();
     <div class="logo-header">
         Aqua<span>Denuncia</span>
     </div>
-    <h1>Lista de Denúncias Recebidas</h1>
+
+    <h1>Painel de Denúncias Recebidas</h1>
 
     <?php if (isset($_GET['status']) && $_GET['status'] == 'atualizado'): ?>
         <p style="color: #4CAF50; font-weight: bold; text-align: center;">Status da denúncia atualizado com sucesso!</p>

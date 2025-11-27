@@ -1,9 +1,9 @@
 <?php
 
-$host = 'localhost';
-$usuario = 'root'; 
-$senha = '';
-$dbname = 'hackathon_desperdicio';
+$servername = "localhost";
+$username = "root"; // Deve ser root
+$password = "";     // Deve ser vazio
+$dbname = "hackathon_desperdicio"; // Nome do seu banco de dados
 
 $conn = new mysqli($host, $usuario, $senha, $dbname);
 
