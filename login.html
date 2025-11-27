@@ -1,111 +1,95 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cidadão Alerta: Denúncia de Desperdício</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>AquaDenuncia - Denúncia de Desperdício</title>
+    
     <style>
-        body { background-color: #f8f9fa; }
-        .container { max-width: 500px; margin-top: 50px; }
-        .form-control[readonly] { background-color: #e9ecef; }
+        .logo-header {
+            background-color: #008CBA;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 25px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo-header span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        h1 { text-align: center; color: #008CBA; }
+        form { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px;
+        }
     </style>
 </head>
-<body>
-
-<div class="container bg-white p-4 rounded shadow">
-    <h3 class="mb-4 text-center text-primary">Relatar Desperdício Urbano</h3>
-    <p class="text-center text-muted">Use este formulário para enviar sua denúncia. A localização GPS é essencial.</p>
-
+<body onload="getLocation()">
+    
+    <div class="logo-header">
+        Aqua<span>Denuncia</span>
+    </div>
+    <h1>Denuncie o Desperdício de Água</h1>
     <form action="salvar_denuncia.php" method="POST">
         
-        <div class="mb-3">
-            <label class="form-label">Localização (GPS) <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="localizacao_display" placeholder="Aguardando GPS..." readonly required>
-            <input type="hidden" name="latitude" id="latitude_input" required>
-            <input type="hidden" name="longitude" id="longitude_input" required>
-            <button type="button" class="btn btn-sm btn-info w-100 mt-2" onclick="getLocation()" id="btn_localizar">
-                Capturar Minha Localização
-            </button>
-            <div id="status_gps" class="form-text"></div>
-        </div>
+        <label for="tipo_denuncia">Tipo de Desperdício:</label>
+        <select id="tipo_denuncia" name="tipo_denuncia" required>
+            <option value="">Selecione...</option>
+            <option value="Vazamento Rua">Vazamento na Rua</option>
+            <option value="Hidrante Aberto">Hidrante Aberto</option>
+            <option value="Lavagem Calçada">Lavagem de Calçada</option>
+            <option value="Outro">Outro</option>
+        </select>
+        <br><br>
+
+        <label for="detalhes">Detalhes da Ocorrência:</label>
+        <textarea id="detalhes" name="detalhes" rows="4" required></textarea>
+        <br><br>
         
-        <div class="mb-3">
-            <label for="tipo_desperdicio" class="form-label">Tipo de Desperdício <span class="text-danger">*</span></label>
-            <select class="form-select" id="tipo_desperdicio" name="tipo_desperdicio" required>
-                <option value="" selected disabled>Selecione o problema...</option>
-                <option value="Agua - Vazamento">Água - Vazamento em rua/calçada</option>
-                <option value="Energia - Lampada Acesa">Energia - Lâmpada pública acesa de dia</option>
-                <option value="Lixo - Descarte Irregular">Lixo - Descarte irregular (entulho/móveis)</option>
-                <option value="Outros">Outros problemas ambientais</option>
-            </select>
-        </div>
+        <input type="hidden" name="latitude" id="latitude" value="">
+        <input type="hidden" name="longitude" id="longitude" value="">
 
-        <div class="mb-3">
-            <label for="detalhes" class="form-label">Detalhes Adicionais (Opcional)</label>
-            <textarea class="form-control" id="detalhes" name="detalhes" rows="3" placeholder="Descreva o que está acontecendo..."></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-success w-100 mt-3">ENVIAR DENÚNCIA</button>
+        <p id="localizacao_status">Tentando obter sua localização...</p>
+        <br>
+        
+        <button type="submit">ENVIAR DENÚNCIA</button>
     </form>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-
-    function getLocation() {
-        const statusDiv = document.getElementById('status_gps');
-        const displayInput = document.getElementById('localizacao_display');
-        const latInput = document.getElementById('latitude_input');
-        const longInput = document.getElementById('longitude_input');
-
-        if (navigator.geolocation) {
-            statusDiv.textContent = "Buscando localização...";
-            statusDiv.classList.remove('text-danger', 'text-success');
-            
-            navigator.geolocation.getCurrentPosition(showPosition, showError, {timeout: 10000});
-        } else {
-            statusDiv.textContent = "Geolocalização não é suportada por este navegador.";
-            statusDiv.classList.add('text-danger');
+    <script>
+        function setCoordinates(lat, lon) {
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lon;
+            document.getElementById('localizacao_status').innerHTML = 'Localização obtida: ' + lat.substring(0, 8) + ', ' + lon.substring(0, 8);
         }
-    }
 
-    function showPosition(position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        
-        document.getElementById('latitude_input').value = lat;
-        document.getElementById('longitude_input').value = lon;
-
-        document.getElementById('localizacao_display').value = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
-        document.getElementById('status_gps').textContent = "Localização capturada com sucesso!";
-        document.getElementById('status_gps').classList.remove('text-danger');
-        document.getElementById('status_gps').classList.add('text-success');
-    }
-
-    function showError(error) {
-        let mensagem = "Erro desconhecido.";
-        switch(error.code) {
-            case error.PERMISSION_DENIED:
-                mensagem = "Permissão de geolocalização negada. Por favor, permita o acesso ao GPS.";
-                break;
-            case error.POSITION_UNAVAILABLE:
-                mensagem = "Informação de localização indisponível.";
-                break;
-            case error.TIMEOUT:
-                mensagem = "O tempo limite para obter a localização expirou. Tente novamente.";
-                break;
+        function success(pos) {
+            const crd = pos.coords;
+            setCoordinates(crd.latitude.toString(), crd.longitude.toString());
         }
-        document.getElementById('status_gps').textContent = `Erro: ${mensagem}`;
-        document.getElementById('status_gps').classList.remove('text-success');
-        document.getElementById('status_gps').classList.add('text-danger');
-        document.getElementById('localizacao_display').value = "Erro na captura do GPS";
-        
-        // Em caso de erro, remove os valores para o formulário não ser enviado sem dados
-        document.getElementById('latitude_input').value = '';
-        document.getElementById('longitude_input').value = '';
-    }
-</script>
 
+        function error(err) {
+            document.getElementById('localizacao_status').innerHTML = 'Falha ao obter a localização. Por favor, tente novamente.';
+            console.warn(`ERRO (${err.code}): ${err.message}`);
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(success, error, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                });
+            } else {
+                document.getElementById('localizacao_status').innerHTML = 'Localização não suportada.';
+            }
+        }
+    </script>
 </body>
 </html>

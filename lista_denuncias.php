@@ -1,104 +1,132 @@
 <?php
-include 'conexao.php';
 
-$mensagem_status = ''; 
+require_once 'conexao.php';
 
 if (isset($_GET['acao']) && $_GET['acao'] == 'resolver' && isset($_GET['id'])) {
+    $id_denuncia = $_GET['id'];
     
-    $id_remover = $conn->real_escape_string($_GET['id']);
+    $sql_update = "UPDATE denuncias SET status = 'Resolvido', data_resolucao = NOW() WHERE id = ?";
+    $stmt_update = $conn->prepare($sql_update);
+    $stmt_update->bind_param("i", $id_denuncia); 
     
-    $sql_update = "UPDATE denuncias SET status = 'Resolvido' WHERE id = '$id_remover'";
-    
-    if ($conn->query($sql_update) === TRUE) {
-        $mensagem_status = "Denúncia #$id_remover marcada como RESOLVIDA com sucesso!";
-    } else {
-        $mensagem_status = "Erro ao resolver denúncia: " . $conn->error;
+    if ($stmt_update->execute()) {
+        header("Location: lista_denuncias.php?status=atualizado");
+        exit();
     }
 }
 
-$sql_select = "SELECT id, tipo_desperdicio, detalhes, latitude, longitude, DATE_FORMAT(data_hora, '%d/%m/%Y %H:%i') AS data_formatada 
-               FROM denuncias 
-               WHERE status = 'Aberto' 
-               ORDER BY data_hora DESC";
-
+$sql_select = "SELECT id, tipo_denuncia, detalhes, latitude, longitude, status, data_criacao FROM denuncias ORDER BY data_criacao DESC";
 $resultado = $conn->query($sql_select);
 
+if ($resultado->num_rows > 0) {
+    $denuncias = $resultado->fetch_all(MYSQLI_ASSOC);
+} else {
+    $denuncias = [];
+}
 
 $conn->close();
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Denúncias Abertas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style> 
-        body { background-color: #f8f9fa; }
-        .container { margin-top: 30px; margin-bottom: 50px; }
-        .table-responsive { overflow-x: auto; }
+    <title>AquaDenuncia - Painel de Denúncias</title>
+    
+    <style>
+        .logo-header {
+            background-color: #008CBA;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 25px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo-header span {
+            font-weight: bold;
+            color: #4CAF50; 
+        }
+
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        h1 { text-align: center; color: #008CBA; }
+        table {
+            border-collapse: collapse;
+            width: 90%; 
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #008CBA;
+            color: white;
+        }
     </style>
 </head>
 <body>
+    
+    <div class="logo-header">
+        Aqua<span>Denuncia</span>
+    </div>
+    <h1>Lista de Denúncias Recebidas</h1>
 
-<div class="container">
-    <h3 class="mb-4 text-center text-secondary">Painel de Denúncias Abertas (Status: Ações Pendentes)</h3>
-
-    <?php if (!empty($mensagem_status)): ?>
-        <div class="alert alert-<?php echo strpos($mensagem_status, 'sucesso') !== false ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
-            <?php echo $mensagem_status; ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <?php if (isset($_GET['status']) && $_GET['status'] == 'atualizado'): ?>
+        <p style="color: #4CAF50; font-weight: bold; text-align: center;">Status da denúncia atualizado com sucesso!</p>
     <?php endif; ?>
 
-    <p class="text-end mb-3">
-        <a href="login.html" class="btn btn-outline-primary btn-sm">Criar Nova Denúncia</a>
-    </p>
-
-    <?php if ($resultado && $resultado->num_rows > 0): ?>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover bg-white">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Tipo</th>
-                        <th>Detalhes</th>
-                        <th>Data/Hora</th>
-                        <th>Localização</th>
-                        <th>Ação (UPDATE)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while($row = $resultado->fetch_assoc()): ?>
-                    <tr>
-                        <td><?php echo $row['id']; ?></td>
-                        <td><span class="badge bg-danger"><?php echo htmlspecialchars($row['tipo_desperdicio']); ?></span></td>
-                        <td><?php echo htmlspecialchars(substr($row['detalhes'], 0, 50)); ?>...</td>
-                        <td><?php echo $row['data_formatada']; ?></td>
-                        <td>
-                            <a href="https://maps.google.com/?q=<?php echo $row['latitude'] . ',' . $row['longitude']; ?>" target="_blank" class="btn btn-sm btn-outline-info" title="Ver no Mapa">
-                                Mapa
-                            </a>
-                        </td>
-                        <td>
-                            <a href="?acao=resolver&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-success" 
-                               onclick="return confirm('Tem certeza que deseja marcar esta denúncia como RESOLVIDA?')">
-                                🛠️ Resolver
-                            </a>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        </div>
+    <?php if (empty($denuncias)): ?>
+        <p style="text-align: center;">Não há denúncias registradas.</p>
     <?php else: ?>
-        <div class="alert alert-success text-center">
-            🎉 Nenhuma denúncia aberta encontrada no momento!
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo</th>
+                    <th>Detalhes</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($denuncias as $d): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($d['id']); ?></td>
+                    <td><?php echo htmlspecialchars($d['tipo_denuncia']); ?></td>
+                    <td><?php echo htmlspecialchars($d['detalhes']); ?></td>
+                    <td><?php echo htmlspecialchars($d['latitude']); ?></td>
+                    <td><?php echo htmlspecialchars($d['longitude']); ?></td>
+                    <td><?php echo htmlspecialchars($d['data_criacao']); ?></td>
+                    <td>
+                        <?php 
+                            $status_color = ($d['status'] == 'Pendente') ? 'orange' : '#4CAF50';
+                            echo '<span style="color: ' . $status_color . '; font-weight: bold;">' . htmlspecialchars($d['status']) . '</span>'; 
+                        ?>
+                    </td>
+                    <td>
+                        <?php if ($d['status'] == 'Pendente'): ?>
+                            <a href="lista_denuncias.php?acao=resolver&id=<?php echo $d['id']; ?>" 
+                               onclick="return confirm('Tem certeza que deseja marcar como Resolvida?');" 
+                               style="color: #008CBA; font-weight: bold;">
+                                **Resolver**
+                            </a>
+                        <?php else: ?>
+                            Resolvido
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     <?php endif; ?>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <p style="text-align: center; margin-top: 20px;"><a href="login.html" style="color: #008CBA;">Voltar para o formulário de denúncia</a></p>
+
 </body>
 </html>
