@@ -2,9 +2,30 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cidadão Alerta - Denúncia de Desperdício</title>
+    <title>AquaDenuncia - Denúncia de Desperdício</title>
+    
+    <style>
+        .logo-header {
+            background-color: #008CBA; 
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 25px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo-header span {
+            font-weight: bold;
+            color: #4CAF50; 
+        }
+    </style>
 </head>
 <body onload="getLocation()">
+    
+    <div class="logo-header">
+        Aqua<span>Denuncia</span>
+    </div>
     <h1>Denuncie o Desperdício de Água</h1>
     <form action="salvar_denuncia.php" method="POST">
         

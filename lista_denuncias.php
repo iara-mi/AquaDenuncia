@@ -7,12 +7,11 @@ if (isset($_GET['acao']) && $_GET['acao'] == 'resolver' && isset($_GET['id'])) {
     
     $sql_update = "UPDATE denuncias SET status = 'Resolvido', data_resolucao = NOW() WHERE id = ?";
     $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("i", $id_denuncia);
+    $stmt_update->bind_param("i", $id_denuncia); 
     
     if ($stmt_update->execute()) {
         header("Location: lista_denuncias.php?status=atualizado");
         exit();
-    } else {
     }
 }
 
@@ -33,18 +32,53 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>Painel de Denúncias - Cidadão Alerta</title>
-    </head>
+    
+    <style>
+        .logo-header {
+            background-color: #008CBA; 
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 25px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo-header span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            margin: 0 auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #008CBA;
+            color: white;
+        }
+    </style>
+</head>
 <body>
+    
+    <div class="logo-header">
+        Aqua<span>Denuncia</span>
+    </div>
     <h1>Lista de Denúncias Recebidas</h1>
 
     <?php if (isset($_GET['status']) && $_GET['status'] == 'atualizado'): ?>
-        <p style="color: green;">Status da denúncia atualizado com sucesso!</p>
+        <p style="color: #4CAF50; font-weight: bold; text-align: center;">Status da denúncia atualizado com sucesso!</p>
     <?php endif; ?>
 
     <?php if (empty($denuncias)): ?>
-        <p>Não há denúncias registradas.</p>
+        <p style="text-align: center;">Não há denúncias registradas.</p>
     <?php else: ?>
-        <table border="1">
+        <table>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -66,12 +100,18 @@ $conn->close();
                     <td><?php echo htmlspecialchars($d['latitude']); ?></td>
                     <td><?php echo htmlspecialchars($d['longitude']); ?></td>
                     <td><?php echo htmlspecialchars($d['data_criacao']); ?></td>
-                    <td><?php echo htmlspecialchars($d['status']); ?></td>
+                    <td>
+                        <?php 
+                            $status_color = ($d['status'] == 'Pendente') ? 'orange' : '#4CAF50';
+                            echo '<span style="color: ' . $status_color . '; font-weight: bold;">' . htmlspecialchars($d['status']) . '</span>'; 
+                        ?>
+                    </td>
                     <td>
                         <?php if ($d['status'] == 'Pendente'): ?>
                             <a href="lista_denuncias.php?acao=resolver&id=<?php echo $d['id']; ?>" 
-                               onclick="return confirm('Tem certeza que deseja marcar esta denúncia como resolvida?');">
-                                Resolver
+                               onclick="return confirm('Tem certeza que deseja marcar como Resolvida?');" 
+                               style="color: #008CBA; font-weight: bold;">
+                                **Resolver**
                             </a>
                         <?php else: ?>
                             Resolvido
@@ -83,7 +123,7 @@ $conn->close();
         </table>
     <?php endif; ?>
 
-    <p><a href="login.html">Voltar para o formulário de denúncia</a></p>
+    <p style="text-align: center; margin-top: 20px;"><a href="login.html" style="color: #008CBA;">Voltar para o formulário de denúncia</a></p>
 
 </body>
 </html>
