@@ -1,0 +1,10 @@
+# .gitignore
+# Arquivos de configurações de ambiente e logs
+
+# Ignora a pasta de cache do VS Code
+.vscode/
+
+# Ignora arquivos de log e temporários do PHP
+*.log
+*.tmp
+/temp/
